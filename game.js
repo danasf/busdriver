@@ -9,14 +9,8 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
  Bus Driver 1.0                                                                            
  Coded at Hacker School, Summer 2014, by Dana Sniezko
  
- Much gratitude and inspiration c/o Mary Rose Cook's Space Invaders live coding demo 
+ Much gratitude and inspiration c/o Mary's live-coding of Space Invaders  
  https://github.com/maryrosecook/spaceinvaders/blob/master/game.js
-
- GPL v3
-
-
- Sounds:
-
 
 */
 
@@ -30,7 +24,10 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		var canvas = document.getElementById(canvasId);
 		var screen = canvas.getContext('2d');
 		var size = { x: canvas.width, y: canvas.height };
+		this.laneSize = (size.x - 2*30) / 4;
 		this.gameSize = size;
+
+		this.decay = 0.01;
 		this.speedY = 0.1;
 		this.bg = new Background(this);
 
@@ -48,17 +45,11 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 
 		this.images.pedestrian.src = './images/stick.png';
 
-
-		// add obstacles
-		//this.bodies = this.bodies.concat(createObstacles(this));
-
 		var self = this;
 
 		var tick = function() {
 			self.update();
-
 			self.draw(screen,size);
-
 			requestAnimationFrame(tick);
 		}
 
@@ -73,12 +64,11 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		var self = this;
 
 		this.bg.update();
+		this.speedY = this.speedY > 0 ? this.speedY - this.decay : this.speedY;
 
 		var isTimeToMakeWalker = function() {
-			var randVal = Math.round(Math.random()*100);
-	   		if(randVal > 96) {
-	   			//console.log("New pedestrian!");
-	  			//console.log(self,self.gameSize);
+	   		if(Math.random() > 0.96) {
+
 				self.bodies.push(new Pedestrian(self,self.gameSize));
 				self.bodies.push(new Car(self,self.gameSize));
 	   		}
@@ -123,7 +113,12 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 				drawRect(screen,this.bodies[i],"#ffffff");
 			}
 		}
-		document.getElementById('speed').innerHTML = Math.round(this.speedY)*10;
+		document.getElementById('speed').innerHTML = Math.round(this.speedY,3)*10;
+
+
+	};
+
+	Game.prototype.atBusStop = function() {
 
 	};
 
@@ -159,46 +154,74 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 	/** 
     * Cars
     **/
-/*    function Car(game,gameSize) {
-    	this.game = game;
-    	this.gameSize = gameSize;
-    	this.type="car";
-    	var startX= Math.round(Math.random())*100;
-		this.center = { x:100, y:300  };
-		this.size = { x:30, y:30 };
-		console.log("Car created!");
-		console.log(this);
 
-    }
-
-    Car.prototype.update = function () {
-    	console.log(car)
-    	// if out of bounds reverse! 
-    	//this.center.y -= 0.1;
-    	console.log("Car center",this.center.y);
-    };*/
     function Car(game,gameSize) {
     	this.game = game;
     	this.gameSize = gameSize;
     	this.type="car";
- 		var startX= Math.round(Math.random()*gameSize.x,3);
+ 		var startX= Math.round(Math.random()*3)*game.laneSize+game.laneSize/2+30;
     	//var startY= Math.floor(Math.random()*gameSize.y)+30;
 		var startY = 0;
 		this.center = { x:startX, y:startY  };
 		this.size = { x:30, y:40 };
 		this.velocity = Math.round(Math.random()*5+0.5,3);
-
+		this.isChangingLanes = false;
+		this.lane = 100;
+		this.dir = Math.random() < 0.5 ? -0.3 : 0.3;
     }
 
     Car.prototype.update = function () {
 
     	if(this.center.x < 0 || this.center.x > this.gameSize.x) {
     		this.velocity = -this.velocity;
-    		console.log("walk speed changes",this.walkSpeed);
+    		//console.log("walk speed changes",this.walkSpeed);
     	}
     	var speed = this.velocity-this.game.speedY;
     	this.center.y -= (speed > -1) ? speed : -1 ;
     	//this.center.x += this.velocity;
+    	//this.changeLanes();
+    	if (Math.random() > 0.995) {
+    		this.isChangingLanes = true;
+    		this.lane = 100;
+    	}
+    	this.changeLanes();
+
+    };
+
+    Car.prototype.changeLanes = function () {
+    	if(this.isChangingLanes) {
+    		if(this.lane == 0) {
+    			this.isChangingLanes = false;
+    		}
+    		   this.center.x += this.dir;
+    		   this.lane--;
+    	}
+    };
+
+
+	/** 
+    * Bikes
+    **/
+
+	/** 
+    * Bus Stop
+    **/
+
+    function BusStop(game,gameSize) {
+    	this.game = game;
+    	this.gameSize = gameSize;
+    	this.type="stop";
+ 		var startX= game.gameSize.x;
+		this.center = { x:startX, y:startY  };
+		this.size = { x:30, y:40 };
+
+    }
+
+    BusStop.prototype.update = function () {
+
+    	if(this.center.x < 0 || this.center.x > this.gameSize.x) {
+    	}
+    
     };
 
 
@@ -237,7 +260,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		this.size = { x:30, y:80 };
 		// center x= half of gamesize, y game height -this plus some padding
 		this.center = { x:gameSize.x/2, y: gameSize.y - this.size.y *2 };
-
+		this.velocity = this.game.speedY;
 		this.keys = new Keyboarder();
 	};
 
@@ -249,10 +272,10 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 			this.center.x += 2;
 		} 
 		else if(this.keys.isDown(this.keys.KEYS.UP)) {
-			this.game.speedY += this.game.speedY < 10 ? 0.1 : 0;
+			this.game.speedY += this.game.speedY < 10 ? 0.05 : 0;
 		} 
 		else if(this.keys.isDown(this.keys.KEYS.DOWN)) {
-			this.game.speedY -= this.game.speedY > 0 ? 0.1 : 0;
+			this.game.speedY -= this.game.speedY > 0 ? 0.05 : 0;
 		} 
 		else if(this.keys.isDown(this.keys.KEYS.SPACE)) {
 			console.log("HONK!!!!!!!!");
@@ -291,12 +314,13 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 
 
 	// returns true if bodies are colliding
-	// from https://github.com/maryrosecook/spaceinvaders/blob/master/game.js
+	// adapted from https://github.com/maryrosecook/spaceinvaders/blob/master/game.js
 	// 1. b1 is the same body as b2.
  	// 2. Right of `b1` is to the left of the left of `b2`.
   	// 3. Bottom of `b1` is above the top of `b2`.
   	// 4. Left of `b1` is to the right of the right of `b2`.
   	// 5. Top of `b1` is below the bottom of `b2`.
+  	// 6. velocity is really low
 	function colliding (b1,b2) {
 		return !(
 			b1 === b2 
@@ -304,6 +328,8 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 	        || b1.center.y + b1.size.y / 2 < b2.center.y - b2.size.y / 2 
 	        || b1.center.x - b1.size.x / 2 > b2.center.x + b2.size.x / 2 
 	        || b1.center.y - b1.size.y / 2 > b2.center.y + b2.size.y / 2
+	        || b1.velocity < 0.1 && b2.velocity < 0.1
+	        //|| b1.type == b2.type
 		);
 	};
 
@@ -342,26 +368,27 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 	function drawBG(screen,body) {
 		// draw street
 		screen.fillStyle = "#333333";
-		screen.fillRect(0,0,600,600);
+		screen.fillRect(0+30,0,body.game.gameSize.x-30,body.game.gameSize.y);
 
 		// draw grassy sides
 		screen.fillStyle = "#00ff00";
 		screen.fillRect(0,0,30,body.game.gameSize.y);
-		screen.fillRect(body.game.gameSize.x,0,300,body.game.gameSize.y);
+		screen.fillRect(body.game.gameSize.x-30,0,body.game.gameSize.x,body.game.gameSize.y);
 
-		for(var i=1; i < 5; i++ ) {
+
+		for(var i=1; i < 4; i++ ) {
 
 
 			screen.beginPath();
 			screen.strokeStyle = "#ffff00";
 
 			screen.setLineDash([10,5]);
-			screen.moveTo((100*i),0+body.offset.y);
-	        screen.lineTo((100*i),body.game.gameSize.y);
+			screen.moveTo(30+(body.game.laneSize*i),0+body.offset.y);
+	        screen.lineTo(30+(body.game.laneSize*i),body.game.gameSize.y);
 	        screen.stroke();
 	        //console.log(body.offset.y);
-	        screen.moveTo((100*i),body.offset.y-5);
-	        screen.lineTo((100*i),0);
+	        screen.moveTo(30+(body.game.laneSize*i),body.offset.y-5);
+	        screen.lineTo(30+(body.game.laneSize*i),0);
 	  	    screen.stroke();
 		}
 		
