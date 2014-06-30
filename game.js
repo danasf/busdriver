@@ -155,6 +155,8 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
     * Cars
     **/
 
+    // needs some cleanup!
+
     function Car(game,gameSize) {
     	this.game = game;
     	this.gameSize = gameSize;
@@ -167,7 +169,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		this.velocity = Math.round(Math.random()*5+0.5,3);
 		this.isChangingLanes = false;
 		this.lane = 100;
-		this.dir = Math.random() < 0.5 ? -0.3 : 0.3;
+		this.dir = Math.random() < 0.5 ? -0.4 : 0.4;
     }
 
     Car.prototype.update = function () {
@@ -203,29 +205,29 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
     * Bikes
     **/
 
+    function Biker(game,gameSize) {
+    	
+
+    }
+
+    Biker.prototype.update = function () {
+
+    
+    };
+
 	/** 
     * Bus Stop
     **/
 
     function BusStop(game,gameSize) {
-    	this.game = game;
-    	this.gameSize = gameSize;
-    	this.type="stop";
- 		var startX= game.gameSize.x;
-		this.center = { x:startX, y:startY  };
-		this.size = { x:30, y:40 };
+    	
 
     }
 
     BusStop.prototype.update = function () {
 
-    	if(this.center.x < 0 || this.center.x > this.gameSize.x) {
-    	}
     
     };
-
-
-
 
 	/** 
     * Background
@@ -247,8 +249,6 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
     	}
     	// if out of bounds reverse! 
     };
-
-
 
 
 	/**
