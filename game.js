@@ -27,8 +27,18 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		this.laneSize = (size.x - 2*30) / 4;
 		this.gameSize = size;
 
+		// is this game over?
+		this.playable = true;
+
+		// deal with score
+		this.scoreInterval = 0;
+		this.score = 0;
+
+		// deal with speed and decay
 		this.decay = 0.01;
 		this.speedY = 0.1;
+
+		// deal with background
 		this.bg = new Background(this);
 
 		// create bodies array to hold player, obstacles etc
@@ -43,10 +53,13 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 			pedestrian: new Image()
 		};
 
+		// ped source
 		this.images.pedestrian.src = './images/stick.png';
 
-		var self = this;
 
+		// animation stuff
+
+		var self = this;
 		var tick = function() {
 			self.update();
 			self.draw(screen,size);
@@ -67,7 +80,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		this.speedY = this.speedY > 0 ? this.speedY - this.decay : this.speedY;
 
 		var isTimeToMakeWalker = function() {
-	   		if(Math.random() > 0.96) {
+	   		if(Math.random() > 0.98) {
 
 				self.bodies.push(new Pedestrian(self,self.gameSize));
 				self.bodies.push(new Car(self,self.gameSize));
@@ -87,6 +100,16 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
    		// check for collisions
    		this.bodies = this.bodies.filter(notCollidingWithAnything);
 
+   		// does the player still exist?
+   		var player = this.bodies.filter(function(b) {
+   			return b.type == "Player";
+   		});
+
+   		if(player.length === 0) {
+   			this.playable = false;
+   		}
+
+
    		// update bodies
 		for(var i = 0; i < this.bodies.length; i++) {
    	    	this.bodies[i].update();
@@ -94,6 +117,13 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
    		//console.log(this.bodies.length,"Things on the board");
 
 		isTimeToMakeWalker();
+
+		if(this.playable) {
+			this.scoreInterval++;
+		} else {
+
+		}
+
 	};
 
 	// draws game elements
@@ -114,7 +144,11 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 			}
 		}
 		document.getElementById('speed').innerHTML = Math.round(this.speedY,3)*10;
-
+		if(this.scoreInterval === 100) {
+			this.score += 2;
+			this.scoreInterval = 0;
+			document.getElementById('score').innerHTML = this.score;
+		}
 
 	};
 
@@ -165,7 +199,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
     	//var startY= Math.floor(Math.random()*gameSize.y)+30;
 		var startY = 0;
 		this.center = { x:startX, y:startY  };
-		this.size = { x:30, y:40 };
+		this.size = { x:40, y:50 };
 		this.velocity = Math.round(Math.random()*5+0.5,3);
 		this.isChangingLanes = false;
 		this.lane = 100;
@@ -257,7 +291,8 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 
 	function Player(game,gameSize) {
 		this.game = game;
-		this.size = { x:30, y:80 };
+		this.type ="Player"
+		this.size = { x:40, y:90 };
 		// center x= half of gamesize, y game height -this plus some padding
 		this.center = { x:gameSize.x/2, y: gameSize.y - this.size.y *2 };
 		this.velocity = this.game.speedY;
@@ -366,7 +401,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 
 	// draw the background and that nonsense
 	function drawBG(screen,body) {
-		// draw street
+		// draw street background
 		screen.fillStyle = "#333333";
 		screen.fillRect(0+30,0,body.game.gameSize.x-30,body.game.gameSize.y);
 
@@ -375,7 +410,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
 		screen.fillRect(0,0,30,body.game.gameSize.y);
 		screen.fillRect(body.game.gameSize.x-30,0,body.game.gameSize.x,body.game.gameSize.y);
 
-
+		// draw some lanes
 		for(var i=1; i < 4; i++ ) {
 
 
