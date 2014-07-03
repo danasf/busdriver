@@ -7,5 +7,4 @@ To Do
 
 * Implement bus stops
 * Improve collision handling
-* Add points system
 * Replace blocks with sprites
