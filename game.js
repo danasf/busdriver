@@ -197,7 +197,7 @@ _  /_/ // /_/ / ____/ /     _  /_/ /_  _, _/__/ /  __ |/ / _  /___  _  _, _/
     	this.type="car";
  		var startX= Math.round(Math.random()*3)*game.laneSize+game.laneSize/2+30;
     	//var startY= Math.floor(Math.random()*gameSize.y)+30;
-		var startY = 0;
+		var startY = Math.random() < 0.5 ? 0 : gameSize.y-50;
 		this.center = { x:startX, y:startY  };
 		this.size = { x:40, y:50 };
 		this.velocity = Math.round(Math.random()*5+0.5,3);
