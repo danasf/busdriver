@@ -7,4 +7,12 @@ To Do
 
 * Implement bus stops
 * Improve collision handling
-* Replace blocks with sprites
+* High score
+
+Possible ideas
+
+* Replace blocks with sprites (?)
+* Fuel usage (?)
+* Bicyclists (?)
+
+Pull requests + collaboration are welcome
