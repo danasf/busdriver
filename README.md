@@ -3,6 +3,8 @@ Bus Driver
 
 A simple game in JavaScript.
 
+![picture](./images/screenshot.png)
+
 To Do
 
 * Implement bus stops
